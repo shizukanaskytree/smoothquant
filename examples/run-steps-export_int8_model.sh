@@ -1,7 +1,13 @@
 ### goal is to run smoothquant_opt_real_int8_demo_use_own_model.ipynb
+### - generate_act_scales.py
+### - export_int8_model.py
 
-### generate_act_scales.py
-### export_int8_model.py
+#-----------------------------------------------------------------------
+
+# python download_pile_val_dataset.py
+
+git lfs install
+git clone https://huggingface.co/datasets/mit-han-lab/pile-val-backup
 
 #-----------------------------------------------------------------------
 
@@ -11,11 +17,11 @@
 conda activate smoothquant
 
 #-----------------------------------------------------------------------
+pip install transformers==4.33.1
 
-# python download_pile_val_dataset.py
-
-git lfs install
-git clone https://huggingface.co/datasets/mit-han-lab/pile-val-backup
+### (smoothquant) root@b49e301cd39f:/workspace/outside-docker/smoothquant-prj/smoothquant/examples# pip show transformers
+### Name: transformers
+### Version: 4.33.1
 
 #-----------------------------------------------------------------------
 
