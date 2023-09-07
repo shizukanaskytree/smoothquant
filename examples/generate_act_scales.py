@@ -34,6 +34,13 @@ def main():
     args = parse_args()
     model, tokenizer = build_model_and_tokenizer(args.model_name)
 
+    ### debugging
+    # for name, module in model.named_modules():
+    #     if hasattr(module, 'weight') and module.weight is not None:
+    #         # print(f"Module: {name} | Weight Shape: {module.weight.shape}")
+    #         if hasattr(module, 'bias') and module.bias is not None:
+    #             print(f"Module: {name} | Bias Shape: {module.bias.shape}")
+
     if not os.path.exists(args.dataset_path):
         print(f'Cannot find the dataset at {args.dataset_path}')
         print('Please download the Pile dataset and put the validation set at the path')
@@ -42,6 +49,9 @@ def main():
 
     act_scales = get_act_scales(model, tokenizer, args.dataset_path,
                                 args.num_samples, args.seq_len)
+
+    ### debugging
+    # print(act_scales), key is layer name, value is tensor
 
     os.makedirs(os.path.dirname(args.output_path), exist_ok=True)
     torch.save(act_scales, args.output_path)

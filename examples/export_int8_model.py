@@ -25,10 +25,20 @@ if __name__ == '__main__':
                         help='location of the calibration dataset, we use the validation set of the Pile dataset')
     parser.add_argument('--export-FT', default=False, action="store_true")
     args = parser.parse_args()
+
     model = OPTForCausalLM.from_pretrained(
         args.model_name, device_map="auto", torch_dtype=torch.float16)
+
+    ### debugging
+    # for name, module in model.named_modules():
+    #     if hasattr(module, 'weight') and module.weight is not None:
+    #         # print(f"Module: {name} | Weight Shape: {module.weight.shape}")
+    #         if hasattr(module, 'bias') and module.bias is not None:
+    #             print(f"Module: {name} | Bias Shape: {module.bias.shape}")
+
     act_scales = torch.load(args.act_scales)
     smooth_lm(model, act_scales, 0.5)
+
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
 
     if not os.path.exists(args.dataset_path):
@@ -42,7 +52,9 @@ if __name__ == '__main__':
                                                                        args.dataset_path,
                                                                        num_samples=args.num_samples,
                                                                        seq_len=args.seq_len)
+
     output_path = Path(args.output_path) / (Path(args.model_name).name + "-smoothquant.pt")
+
     if args.export_FT:
         model.save_pretrained(output_path)
         print(f"Saved smoothed model at {output_path}")

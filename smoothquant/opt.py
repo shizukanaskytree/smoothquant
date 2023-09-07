@@ -18,10 +18,21 @@ from transformers.utils import logging
 from torch_int.nn.bmm import BMM_S8T_S8N_S8T, BMM_S8T_S8N_F32T
 logger = logging.get_logger(__name__)
 
+# import pysnooper
+# import datetime
+# import os
+
+# current_file_path = os.path.abspath(__file__)
+# file_name = os.path.splitext(os.path.basename(current_file_path))[0]
+# file_extension = os.path.splitext(os.path.basename(current_file_path))[1][1:]
+# log_folder = os.path.join(os.path.dirname(current_file_path), file_name + '-' + file_extension + '-logs')
+# timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+# os.makedirs(log_folder, exist_ok=True)
 
 class Int8OPTAttention(nn.Module):
     """Multi-headed attention from 'Attention Is All You Need' paper"""
 
+    # @pysnooper.snoop(os.path.join(log_folder, f"Int8OPTAttention-init-{timestamp}.log"), color=False, max_variable_length=2000)
     def __init__(
         self,
         embed_dim: int,
@@ -420,6 +431,7 @@ class Int8OPTModel(OPTPreTrainedModel):
 class Int8OPTForCausalLM(OPTPreTrainedModel):
     _keys_to_ignore_on_load_missing = [r"lm_head.weight"]
 
+    # @pysnooper.snoop(os.path.join(log_folder, f"Int8OPTForCausalLM-init-{timestamp}.log"), color=False, max_variable_length=2000)
     def __init__(self, config):
         super().__init__(config)
         self.model = Int8OPTModel(config)
