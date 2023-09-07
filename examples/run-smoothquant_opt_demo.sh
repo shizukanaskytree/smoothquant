@@ -16,8 +16,6 @@ git clone https://huggingface.co/datasets/mit-han-lab/pile-val-backup
 
 #-----------------------------------------------------------------------
 
-# FACEBOOK_DATASET_PATH=
-# VAL_DATASET_PATH=
 python generate_act_scales.py \
     --model-name 'facebook/opt-125m' \
     --output-path 'act_scales/opt-125m.pt' \

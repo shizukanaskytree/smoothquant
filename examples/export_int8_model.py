@@ -63,6 +63,20 @@ if __name__ == '__main__':
         torch.save(raw_scales, output_path)
         print(f"Saved scaling factors at {output_path}")
     else:
+
+        for name, param in model.named_parameters():
+            if 'bias' in name and 'final_layer_norm' not in name and 'self_attn_layer_norm' not in name:
+                # Assuming you want to add a new dimension at the beginning of the tensor
+                param.data = param.data.unsqueeze(0)
+
         int8_model = Int8OPTForCausalLM.from_float(model, decoder_layer_scales)
+
+        ### debugging
+        # for name, module in model.named_modules():
+        #     if hasattr(module, 'weight') and module.weight is not None:
+        #         # print(f"Module: {name} | Weight Shape: {module.weight.shape}")
+        #         if hasattr(module, 'bias') and module.bias is not None:
+        #             print(f"Module: {name} | Bias Shape: {module.bias.shape}")
+
         int8_model.save_pretrained(output_path)
         print(f"Saved int8 model at {output_path}")

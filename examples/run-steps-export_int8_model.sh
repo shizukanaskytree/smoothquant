@@ -19,9 +19,9 @@ git clone https://huggingface.co/datasets/mit-han-lab/pile-val-backup
 
 #-----------------------------------------------------------------------
 
-MODEL_NAME='facebook/opt-125m'
-ACT_SCALES_PT_FILE='./act_scales/opt-125m.pt'
-DATASET_PATH='pile-val-backup/val.jsonl.zst'
+export MODEL_NAME='facebook/opt-125m'
+export ACT_SCALES_PT_FILE='./act_scales/opt-125m.pt'
+export DATASET_PATH='pile-val-backup/val.jsonl.zst'
 
 python generate_act_scales.py \
     --model-name $MODEL_NAME \
@@ -39,7 +39,3 @@ python export_int8_model.py \
     --output-path 'int8_models'
 
 ### go to smoothquant_opt_real_int8_demo_use_own_model.ipynb file and Run All
-
-python debug_opt_real_int8.py
-
-
