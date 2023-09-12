@@ -61,6 +61,9 @@ eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
 
 ### https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
+cat ~/.ssh/id_ed25519.pub
+# Then select and copy the contents of the id_ed25519.pub file
+# displayed in the terminal to your clipboard
 
 #-------------------------------------------------------------------------------
 
