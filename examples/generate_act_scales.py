@@ -9,10 +9,15 @@ import argparse
 
 from smoothquant.calibration import get_act_scales
 
+# import debugpy; debugpy.listen(5678); debugpy.wait_for_client(); debugpy.breakpoint()
+
 def build_model_and_tokenizer(model_name):
     tokenizer = AutoTokenizer.from_pretrained(model_name, model_max_length=512)
     kwargs = {"torch_dtype": torch.float16, "device_map": "sequential"}
     model = AutoModelForCausalLM.from_pretrained(model_name, **kwargs)
+    ### 保存成pt文件后进行可视化
+    # print(f"model: \n{model}")
+    torch.save(model, "./logs/model.pt")
     return model, tokenizer
 
 def parse_args():
@@ -32,6 +37,7 @@ def parse_args():
 @torch.no_grad()
 def main():
     args = parse_args()
+    print(f"model name: {args.model_name}")
     model, tokenizer = build_model_and_tokenizer(args.model_name)
 
     ### debugging
