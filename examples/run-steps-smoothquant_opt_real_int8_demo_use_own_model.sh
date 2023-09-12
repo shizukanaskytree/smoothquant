@@ -44,16 +44,8 @@ python generate_act_scales.py \
     --output-path $ACT_SCALES_PT_FILE \
     --dataset-path $DATASET_PATH\
     --num-samples 512 \
-    --seq-len 512 \
-    2>&1 | tee logs/generate_act_scales_$(date +"%Y-%m-%d_%H-%M-%S").log
-
-#-----------------------------------------------------------------------
-
-### todo: visualize_model
-# python visualize_model.py \
-#     --model-name $MODEL_NAME \
-#     --seq-len 512 \
-#     2>&1 | tee logs/visualize_model_$(date +"%Y-%m-%d_%H-%M-%S").log
+    --seq-len 512
+    # 2>&1 | tee logs/generate_act_scales_$(date +"%Y-%m-%d_%H-%M-%S").log
 
 #-----------------------------------------------------------------------
 
@@ -63,7 +55,7 @@ python export_int8_model.py \
     --seq-len 512 \
     --act-scales $ACT_SCALES_PT_FILE \
     --dataset-path $DATASET_PATH \
-    --output-path 'int8_models' \
-    2>&1 | tee logs/export_int8_model_$(date +"%Y-%m-%d_%H-%M-%S").log
+    --output-path 'int8_models'
+    # 2>&1 | tee logs/export_int8_model_$(date +"%Y-%m-%d_%H-%M-%S").log
 
 ### go to smoothquant_opt_real_int8_demo_use_own_model.ipynb file and Run All

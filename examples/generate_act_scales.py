@@ -15,9 +15,12 @@ def build_model_and_tokenizer(model_name):
     tokenizer = AutoTokenizer.from_pretrained(model_name, model_max_length=512)
     kwargs = {"torch_dtype": torch.float16, "device_map": "sequential"}
     model = AutoModelForCausalLM.from_pretrained(model_name, **kwargs)
+
     ### 保存成pt文件后进行可视化
     # print(f"model: \n{model}")
-    torch.save(model, "./logs/model.pt")
+    # torch.save(model, "./logs/model.pt")
+    # torch.onnx.export(model, model, "./logs/model.onnx")
+
     return model, tokenizer
 
 def parse_args():

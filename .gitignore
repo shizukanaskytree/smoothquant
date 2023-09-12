@@ -165,4 +165,5 @@ cython_debug/
 #.idea/
 
 examples/act_scales/*
-examples/logs/*.pt
+examples/logs/*
+examples/model.gv

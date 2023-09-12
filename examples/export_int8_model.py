@@ -1,3 +1,5 @@
+# import debugpy; debugpy.listen(5678); debugpy.wait_for_client(); debugpy.breakpoint()
+
 import torch
 import argparse
 import os
@@ -11,6 +13,30 @@ from smoothquant.opt import Int8OPTForCausalLM
 from smoothquant.smooth import smooth_lm
 
 from smoothquant.calibration import get_static_decoder_layer_scales
+
+from torchview import draw_graph
+# import graphviz
+# graphviz.set_jupyter_format('png')
+
+def model_viewer(int8_model):
+    # print(f"int8_model: \n{int8_model}")
+
+    device = next(int8_model.parameters()).device
+    ### Sample input for visualization, You can replace this with any sample text
+    sample_text = "Hello, world!"
+    input_ids = tokenizer(sample_text, return_tensors="pt").input_ids.to(device)
+
+    model_graph = draw_graph(
+        int8_model,
+        input_data=input_ids,
+        expand_nested=True,
+        depth=10,
+        hide_inner_tensors=False,
+        hide_module_functions=False,
+        save_graph=True,
+    )
+
+    # dot -Tpdf model.gv -o model-viewer/int8_model-depth-10.pdf
 
 
 if __name__ == '__main__':
@@ -70,6 +96,9 @@ if __name__ == '__main__':
                 param.data = param.data.unsqueeze(0)
 
         int8_model = Int8OPTForCausalLM.from_float(model, decoder_layer_scales)
+
+        ### save model for visualization
+        # model_viewer(int8_model)
 
         ### debugging
         # for name, module in model.named_modules():
