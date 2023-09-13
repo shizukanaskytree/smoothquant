@@ -1,4 +1,4 @@
-# import debugpy; debugpy.listen(5678); debugpy.wait_for_client(); debugpy.breakpoint()
+import debugpy; debugpy.listen(5678); debugpy.wait_for_client(); debugpy.breakpoint()
 
 import torch
 import argparse
@@ -18,26 +18,27 @@ from torchview import draw_graph
 # import graphviz
 # graphviz.set_jupyter_format('png')
 
-def model_viewer(int8_model):
+def model_viewer(model, tokenizer, filename: str):
     # print(f"int8_model: \n{int8_model}")
 
-    device = next(int8_model.parameters()).device
+    device = next(model.parameters()).device
     ### Sample input for visualization, You can replace this with any sample text
     sample_text = "Hello, world!"
+
     input_ids = tokenizer(sample_text, return_tensors="pt").input_ids.to(device)
 
     model_graph = draw_graph(
-        int8_model,
+        model,
         input_data=input_ids,
         expand_nested=True,
         depth=10,
         hide_inner_tensors=False,
         hide_module_functions=False,
+        directory='./logs',
+        filename=filename,
         save_graph=True,
     )
-
-    # dot -Tpdf model.gv -o model-viewer/int8_model-depth-10.pdf
-
+    # dot -Tpdf ./logs/model.gv -o model-viewer/int8_model-depth-10.pdf
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -50,10 +51,13 @@ if __name__ == '__main__':
     parser.add_argument('--dataset-path', type=str, default='dataset/val.jsonl.zst',
                         help='location of the calibration dataset, we use the validation set of the Pile dataset')
     parser.add_argument('--export-FT', default=False, action="store_true")
+    parser.add_argument('--torch-viewer', default=False, action="store_true", help="visualize pytorch int8 models https://github.com/mert-kurttutan/torchview")
     args = parser.parse_args()
 
     model = OPTForCausalLM.from_pretrained(
         args.model_name, device_map="auto", torch_dtype=torch.float16)
+
+    # print(f"OPTForCausalLM:\n{model}")
 
     ### debugging
     # for name, module in model.named_modules():
@@ -89,7 +93,6 @@ if __name__ == '__main__':
         torch.save(raw_scales, output_path)
         print(f"Saved scaling factors at {output_path}")
     else:
-
         for name, param in model.named_parameters():
             if 'bias' in name and 'final_layer_norm' not in name and 'self_attn_layer_norm' not in name:
                 # Assuming you want to add a new dimension at the beginning of the tensor
@@ -98,7 +101,9 @@ if __name__ == '__main__':
         int8_model = Int8OPTForCausalLM.from_float(model, decoder_layer_scales)
 
         ### save model for visualization
-        # model_viewer(int8_model)
+        if args.torch_viewer:
+            # model_viewer(model, tokenizer, filename='model-OPTForCausalLM.gv')
+            model_viewer(int8_model, tokenizer, filename='int8-model-Int8OPTForCausalLM.gv')
 
         ### debugging
         # for name, module in model.named_modules():

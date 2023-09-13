@@ -56,6 +56,10 @@ python export_int8_model.py \
     --act-scales $ACT_SCALES_PT_FILE \
     --dataset-path $DATASET_PATH \
     --output-path 'int8_models'
+    # --torch-viewer \
     # 2>&1 | tee logs/export_int8_model_$(date +"%Y-%m-%d_%H-%M-%S").log
+
+### view model
+# dot -Tpdf ./logs/model.gv -o model-viewer/int8_model-depth-10.pdf
 
 ### go to smoothquant_opt_real_int8_demo_use_own_model.ipynb file and Run All
