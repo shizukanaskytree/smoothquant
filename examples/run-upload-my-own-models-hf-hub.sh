@@ -9,5 +9,5 @@ HUGGINGFACE_TOKEN=...
 ### https://huggingface.co/docs/huggingface_hub/guides/upload
 huggingface-cli login --token $HUGGINGFACE_TOKEN
 
-# In: (smoothquant) root@b0d7aa59d3f2:/workspace/outside-docker/smoothquant-prj/smoothquant/examples#
-python upload_model_to_HF_hub.py
+### then you turn on True option on generate_act_scales.py and export_int8_model.py
+### then run those two as run-steps-smoothquant_opt_real_int8_demo_use_own_model.sh

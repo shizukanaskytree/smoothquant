@@ -93,6 +93,31 @@ if __name__ == '__main__':
         torch.save(raw_scales, output_path)
         print(f"Saved scaling factors at {output_path}")
     else:
+
+        #-----------------------------------------------------------------------
+        ### we are going to upload int8_model but we do not squeeze bias tensor etc.
+        int8_model_origin = Int8OPTForCausalLM.from_float(model, decoder_layer_scales)
+
+        ### upload to my huggingface hub
+        if True:
+            from huggingface_hub import HfApi
+            # from huggingface_hub import create_repo
+
+            ### https://huggingface.co/docs/huggingface_hub/guides/repository
+            repo_id = "skytree/smoothquant-models"
+            # create_repo(repo_id) # only run the first time
+
+            ### todo: hardcode now
+            output_path = "/workspace/outside-docker/smoothquant-prj/smoothquant/examples/int8_models-origin/opt-125m-smoothquant.pt"
+            int8_model_origin.save_pretrained(output_path)
+
+            api = HfApi()
+            api.upload_folder(
+                folder_path=output_path,
+                repo_id=repo_id,
+            )
+        #-----------------------------------------------------------------------
+
         ### fix bug to make model adapt to huggingface model shape for some tensors.
         for name, param in model.named_parameters():
             if 'bias' in name and 'final_layer_norm' not in name and 'self_attn_layer_norm' not in name:

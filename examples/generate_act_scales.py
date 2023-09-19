@@ -43,6 +43,13 @@ def main():
     print(f"model name: {args.model_name}")
     model, tokenizer = build_model_and_tokenizer(args.model_name)
 
+    #---------------------------------------------------------------------------
+    ### todo: hardcode now
+    if True: # save tokenizer locally and then we can upload to my HF hub: https://huggingface.co/skytree/smoothquant-models/tree/main
+        print("Saving tokenizer locally...")
+        tokenizer.save_pretrained("/workspace/outside-docker/smoothquant-prj/smoothquant/examples/int8_models-origin/opt-125m-smoothquant.pt")
+    #---------------------------------------------------------------------------
+
     ### debugging
     # for name, module in model.named_modules():
     #     if hasattr(module, 'weight') and module.weight is not None:

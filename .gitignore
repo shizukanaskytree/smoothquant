@@ -167,3 +167,4 @@ cython_debug/
 examples/act_scales/*
 examples/logs/*
 examples/model.gv
+examples/int8_models-origin/*
