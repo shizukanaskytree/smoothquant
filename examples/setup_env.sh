@@ -3,7 +3,8 @@
 #-------------------------------------------------------------------------------
 
 ### docker pull
-docker pull nvcr.io/nvidia/pytorch:21.06-py3
+IMAGE=nvcr.io/nvidia/pytorch:21.06-py3
+docker pull $IMAGE
 
 watch -n0.1 nvidia-smi
 
@@ -14,7 +15,7 @@ watch -n0.1 nvidia-smi
 LOCAL_DIR=/home/xiaofeng.wu/prjs/zip-model/docker_file_system
 CONTAINER_DIR=/workspace/outside-docker
 CONTAINER_NAME=zip_model
-docker run --name $CONTAINER_NAME --gpus all --ipc=host -it -v $LOCAL_DIR:$CONTAINER_DIR nvcr.io/nvidia/pytorch:21.06-py3
+docker run --name $CONTAINER_NAME --gpus all --ipc=host -it -v $LOCAL_DIR:$CONTAINER_DIR $IMAGE
 
 #-------------------------------------------------------------------------------
 
@@ -118,6 +119,7 @@ cd smoothquant
 
 pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
 pip install transformers accelerate datasets zstandard
+pip install huggingface_hub
 
 # python setup.py install ### if I want to debug the src
 pip install -e .

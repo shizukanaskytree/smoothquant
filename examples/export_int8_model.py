@@ -1,4 +1,4 @@
-import debugpy; debugpy.listen(5678); debugpy.wait_for_client(); debugpy.breakpoint()
+# import debugpy; debugpy.listen(5678); debugpy.wait_for_client(); debugpy.breakpoint()
 
 import torch
 import argparse
@@ -93,6 +93,7 @@ if __name__ == '__main__':
         torch.save(raw_scales, output_path)
         print(f"Saved scaling factors at {output_path}")
     else:
+        ### fix bug to make model adapt to huggingface model shape for some tensors.
         for name, param in model.named_parameters():
             if 'bias' in name and 'final_layer_norm' not in name and 'self_attn_layer_norm' not in name:
                 # Assuming you want to add a new dimension at the beginning of the tensor
