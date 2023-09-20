@@ -45,7 +45,8 @@ def main():
     # print(model_w8a8)
 
     tokenizer = GPT2Tokenizer.from_pretrained(model_name)
-    dataset = load_dataset('lambada', split='validation[:1000]')
+    dataset = load_dataset('lambada', split='validation[:1000]') # for testing
+    # dataset = load_dataset('lambada', split='validation')
     evaluator = Evaluator(dataset, tokenizer, 'cuda')
 
     acc_w8a8 = evaluator.evaluate(model_w8a8)
