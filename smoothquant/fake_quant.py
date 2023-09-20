@@ -4,9 +4,16 @@ from functools import partial
 
 
 def quantize_weight_per_channel_absmax(w, n_bits=8):
-    # w: (out_features, in_features)
+    """Define a function to quantize weights per channel using absolute maximum value
+    """
+    ### Get the absolute maximum value for each channel
+    ### w: (out_features, in_features)
     scales = w.abs().max(dim=-1, keepdim=True)[0]
+
+    ### Calculate the maximum quantized value
     q_max = 2**(n_bits-1)-1
+
+    ### Clamp and scale the weights
     scales.clamp_(min=1e-5).div_(q_max)
     w.div_(scales).round_().mul_(scales)
     return w
