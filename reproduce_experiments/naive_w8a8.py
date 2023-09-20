@@ -16,11 +16,7 @@ def quantize_model(model, weight_quant='per_tensor', act_quant='per_tensor', qua
     The above function quantize_model is used to quantize specific layers of a
     given model. It checks for instances of OPTDecoderLayer and OPTAttention
     within the model and applies quantization to their respective attributes.
-
-
-
     """
-
     for name, m in model.model.named_modules():
         if isinstance(m, OPTDecoderLayer):
             m.fc1 = W8A8Linear.from_float(m.fc1, weight_quant=weight_quant, act_quant=act_quant)
@@ -43,8 +39,8 @@ def main():
     args = parser.parse_args()
 
     model_name = args.model_name
-
     model_fp16 = OPTForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16, device_map='auto')
+    ### convert the model to W8A8
     model_w8a8 = quantize_model(model_fp16)
     # print(model_w8a8)
 
