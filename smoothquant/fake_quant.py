@@ -4,18 +4,33 @@ from functools import partial
 
 
 def quantize_weight_per_channel_absmax(w, n_bits=8):
-    """Define a function to quantize weights per channel using absolute maximum value
-    """
-    ### Get the absolute maximum value for each channel
+    """Define a function to quantize weights per channel using absolute maximum value"""
     ### w: (out_features, in_features)
-    scales = w.abs().max(dim=-1, keepdim=True)[0]
+
+    ### per channel 对应的代码是 max(dim=-1, ...)
+    scales = w.abs().max(dim=-1, keepdim=True)[0] # Get the absolute maximum value for each channel
 
     ### Calculate the maximum quantized value
     q_max = 2**(n_bits-1)-1
 
     ### Clamp and scale the weights
     scales.clamp_(min=1e-5).div_(q_max)
-    w.div_(scales).round_().mul_(scales)
+    # print(f"scales:\n{scales}")
+
+    ### 分步打印, the order is IMPT
+    # w_clone = w.clone()
+    # x1 = w_clone.div_(scales)
+    # print(f"x1:\n{x1}")
+
+    # x2 = x1.round_()
+    # print(f"x2:\n{x2}")
+
+    # x3 = x2.mul_(scales)
+    # print(f"x3:\n{x3}")
+
+    w.div_(scales).round_().mul_(scales) # origin
+    # print(f"w_origin:\n{w}")
+    ### 最后能确保 w 的值能被 scales 除尽, 不是无穷小数; 量子的意思是, 量子化后的值, 一定是 scales 的倍数
     return w
 
 
