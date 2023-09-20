@@ -13,11 +13,11 @@ def quantize_weight_per_channel_absmax(w, n_bits=8):
     ### Calculate the maximum quantized value
     q_max = 2**(n_bits-1)-1
 
-    ### Clamp and scale the weights
+    ### Clamp all elements in input into the range [min, max] and scale the weights
     scales.clamp_(min=1e-5).div_(q_max)
     # print(f"scales:\n{scales}")
 
-    ### 分步打印, the order is IMPT
+    # ### 分步打印, the order is IMPT
     # w_clone = w.clone()
     # x1 = w_clone.div_(scales)
     # print(f"x1:\n{x1}")
@@ -28,7 +28,7 @@ def quantize_weight_per_channel_absmax(w, n_bits=8):
     # x3 = x2.mul_(scales)
     # print(f"x3:\n{x3}")
 
-    w.div_(scales).round_().mul_(scales) # origin
+    w.div_(scales).round_().mul_(scales) # original code
     # print(f"w_origin:\n{w}")
     ### 最后能确保 w 的值能被 scales 除尽, 不是无穷小数; 量子的意思是, 量子化后的值, 一定是 scales 的倍数
     return w

@@ -4,7 +4,7 @@
 # quantize the weights per channel using the absolute maximum value. The
 # function returns the quantized weights, which are then printed as a tensor.
 
-# import debugpy; debugpy.listen(5678); debugpy.wait_for_client(); debugpy.breakpoint()
+import debugpy; debugpy.listen(5678); debugpy.wait_for_client(); debugpy.breakpoint()
 
 import sys
 # Add the path of the folder containing the functions
@@ -29,8 +29,8 @@ print(quantized_w)
 
 ### example 2:
 w = torch.tensor([
-        [12.70, 25.40],
-        [25.40, 38.10],
+        [12.71, 25.41],
+        [25.49, 38.19],
     ])
 quantized_w = quantize_weight_per_channel_absmax(w, n_bits=8)
 print(quantized_w)
