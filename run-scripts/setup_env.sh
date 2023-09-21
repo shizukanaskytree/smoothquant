@@ -39,6 +39,7 @@ docker start $CONTAINER_NAME
 docker attach $CONTAINER_NAME
 
 ### check all conda env in the docker
+conda deactivate
 conda info --env
 conda activate smoothquant
 
@@ -69,7 +70,6 @@ cat ~/.ssh/id_ed25519.pub
 #-------------------------------------------------------------------------------
 
 apt-get install git-lfs
-
 git lfs install
 
 #-------------------------------------------------------------------------------

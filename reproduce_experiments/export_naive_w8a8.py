@@ -5,13 +5,9 @@ import torch
 from transformers.models.opt.modeling_opt import OPTAttention, OPTDecoderLayer, OPTForCausalLM
 from transformers import GPT2Tokenizer
 from datasets import load_dataset
-from huggingface_hub import HfApi
-from huggingface_hub import create_repo
 
 # from smoothquant.smooth import smooth_lm
 from smoothquant.fake_quant import W8A8Linear
-
-from evaluator import Evaluator
 
 def quantize_model(model, weight_quant='per_tensor', act_quant='per_tensor', quantize_bmm_input=True):
     """ Code is adapted from the examples/smoothquant_opt_demo.ipynb
@@ -35,40 +31,19 @@ def quantize_model(model, weight_quant='per_tensor', act_quant='per_tensor', qua
             m.out_proj = W8A8Linear.from_float(m.out_proj, weight_quant=weight_quant, act_quant=act_quant)
     return model
 
-def upload_hf_hub(args, tokenizer, model_w8a8):
-    """
-    Save the mdoel and tokenizer locally and then upload to the remote HF hub.
-    HF hub: https://huggingface.co/skytree/smoothquant-models/tree/main
-    """
-    local_saved_path = Path(args.smoothquant_int8_model_output) / args.model_name
-    tokenizer.save_pretrained(local_saved_path)
-    model_w8a8.save_pretrained(local_saved_path)
-
-    ### tutorial: https://huggingface.co/docs/huggingface_hub/guides/repository
-    try:
-        create_repo(args.hf_repo_id)
-    except:
-        print("Repo already created.")
-
-    api = HfApi()
-    api.upload_folder(folder_path=local_saved_path, repo_id=args.hf_repo_id)
-
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Load a specific model.")
-
     parser.add_argument('--model_name', type=str, default='facebook/opt-125m',
         help='Name of the OPT model to load. facebook/opt-125m, facebook/opt-6.7b, facebook/opt-13b')
-
-    parser.add_argument('--smoothquant-int8-model-output', type=str, default='',
-        help='Saved local path')
-
-    parser.add_argument('--hf-repo-id', type=str, default="skytree/smoothquant-models",
-        help='HF Hub ID')
-
+    parser.add_argument('--naive_w8a8_output', type=str, default='',
+        help='Saved w8a8 model to local path')
+    parser.add_argument('--fp16_model_output', type=str, default='',
+        help='Saved f16 model to local path')
+    parser.add_argument('--hf-repo-id', type=str, default=None,
+        help='HF Hub ID, e.g., skytree/smoothquant-models, if None, then we do not upload to HF hub')
     args = parser.parse_args()
     return args
-
 
 def main():
     args = parse_arguments()
@@ -83,16 +58,20 @@ def main():
 
     tokenizer = GPT2Tokenizer.from_pretrained(model_name)
 
-    if args.smoothquant_int8_model_output:
-        upload_hf_hub(args, tokenizer, model_w8a8)
-        print(f"Saved smoothed model at {args.smoothquant_int8_model_output}")
+    w8a8_saved_path = Path(args.naive_w8a8_output) / args.model_name
+    tokenizer.save_pretrained(w8a8_saved_path)
+    model_w8a8.save_pretrained(w8a8_saved_path)
 
-    dataset = load_dataset('lambada', split='validation[:1000]') # for testing
+    fp16_saved_path = Path(args.fp16_model_output) / args.model_name
+    tokenizer.save_pretrained(fp16_saved_path)
+    model_fp16.save_pretrained(fp16_saved_path)
+
+    # dataset = load_dataset('lambada', split='validation[:1000]') # for testing
     # dataset = load_dataset('lambada', split='validation')
-    evaluator = Evaluator(dataset, tokenizer, 'cuda')
+    # evaluator = Evaluator(dataset, tokenizer, 'cuda')
 
-    acc_w8a8 = evaluator.evaluate(model_w8a8)
-    print(f'Naive W8A8 quantized model accuracy: {acc_w8a8}')
+    # acc_w8a8 = evaluator.evaluate(model_w8a8)
+    # print(f'Naive W8A8 quantized model accuracy: {acc_w8a8}')
 
 if __name__ == '__main__':
     main()

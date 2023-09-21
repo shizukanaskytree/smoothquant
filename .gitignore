@@ -167,4 +167,14 @@ cython_debug/
 examples/act_scales/*
 examples/logs/*
 examples/model.gv
-examples/int8_models-origin/*
+examples/int8_models_origin/*
+reproduce_experiments/naive_w8a8_opt-*/*
+examples/smoothquant-opt-*
+
+### https://stackoverflow.com/questions/8650871/telling-git-to-ignore-symlinks
+### find . -type l | sed -e s'/^\.\///g' >> .gitignore
+examples/run-steps-smoothquant_opt_real_int8_demo_use_own_model.sh
+examples/pile-val-backup/pile-val-backup
+reproduce_experiments/run-export-smoothquant-int8-model.sh
+reproduce_experiments/pile-val-backup
+reproduce_experiments/run-export-naive-w8a8-benchmark.sh

@@ -3,15 +3,14 @@
 import torch
 import argparse
 import os
-
 from pathlib import Path
 
 from transformers.models.opt.modeling_opt import OPTForCausalLM
 from transformers import AutoTokenizer
+from huggingface_hub import HfApi, create_repo
 
 from smoothquant.opt import Int8OPTForCausalLM
 from smoothquant.smooth import smooth_lm
-
 from smoothquant.calibration import get_static_decoder_layer_scales
 
 from torchview import draw_graph
@@ -47,7 +46,11 @@ if __name__ == '__main__':
     parser.add_argument("--seq-len", type=int, default=512)
     parser.add_argument("--act-scales", type=str,
                         default='act_scales/opt-13b.pt')
-    parser.add_argument("--output-path", type=str, default='int8_models')
+    parser.add_argument("--output-path", type=str, default='int8_models for the following ipynb demo example')
+    parser.add_argument("--smoothquant-output", type=str, default=None,
+                        help="where to save the original smoothquant int8 model")
+    parser.add_argument("--hf_repo_id", type=str, default=None,
+                        help="HF hub repo id, skytree/smoothquant-[MODEL_NAME], skytree/smoothquant-opt-125m, skytree/smoothquant-opt-6.7b, skytree/smoothquant-opt-13b")
     parser.add_argument('--dataset-path', type=str, default='dataset/val.jsonl.zst',
                         help='location of the calibration dataset, we use the validation set of the Pile dataset')
     parser.add_argument('--export-FT', default=False, action="store_true")
@@ -70,6 +73,9 @@ if __name__ == '__main__':
     smooth_lm(model, act_scales, 0.5)
 
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+    ### save tokenizer locally
+    if args.smoothquant_output:
+        tokenizer.save_pretrained(Path(args.smoothquant_output))
 
     if not os.path.exists(args.dataset_path):
         print(f'Cannot find the dataset at {args.dataset_path}')
@@ -77,11 +83,13 @@ if __name__ == '__main__':
         print('You can download the validation dataset of the Pile at https://mystic.the-eye.eu/public/AI/pile/val.jsonl.zst')
         raise FileNotFoundError
 
-    decoder_layer_scales, raw_scales = get_static_decoder_layer_scales(model,
-                                                                       tokenizer,
-                                                                       args.dataset_path,
-                                                                       num_samples=args.num_samples,
-                                                                       seq_len=args.seq_len)
+    decoder_layer_scales, raw_scales = \
+        get_static_decoder_layer_scales(
+            model,
+            tokenizer,
+            args.dataset_path,
+            num_samples=args.num_samples,
+            seq_len=args.seq_len)
 
     output_path = Path(args.output_path) / (Path(args.model_name).name + "-smoothquant.pt")
 
@@ -93,32 +101,14 @@ if __name__ == '__main__':
         torch.save(raw_scales, output_path)
         print(f"Saved scaling factors at {output_path}")
     else:
-
         #-----------------------------------------------------------------------
         ### we are going to upload int8_model but we do not squeeze bias tensor etc.
-        int8_model_origin = Int8OPTForCausalLM.from_float(model, decoder_layer_scales)
-
-        ### upload to my huggingface hub
-        if True:
-            from huggingface_hub import HfApi
-            # from huggingface_hub import create_repo
-
-            ### https://huggingface.co/docs/huggingface_hub/guides/repository
-            repo_id = "skytree/smoothquant-models"
-            # create_repo(repo_id) # only run the first time
-
-            ### todo: hardcode now
-            output_path = "/workspace/outside-docker/smoothquant-prj/smoothquant/examples/int8_models-origin/opt-125m-smoothquant.pt"
-            int8_model_origin.save_pretrained(output_path)
-
-            api = HfApi()
-            api.upload_folder(
-                folder_path=output_path,
-                repo_id=repo_id,
-            )
+        if args.smoothquant_output:
+            smoothquant_model_origin = Int8OPTForCausalLM.from_float(model, decoder_layer_scales)
+            smoothquant_model_origin.save_pretrained(args.smoothquant_output)
         #-----------------------------------------------------------------------
 
-        ### fix bug to make model adapt to huggingface model shape for some tensors.
+        ### fix bug to make model adapt to huggingface model shape for some tensors in the ipynb demo.
         for name, param in model.named_parameters():
             if 'bias' in name and 'final_layer_norm' not in name and 'self_attn_layer_norm' not in name:
                 # Assuming you want to add a new dimension at the beginning of the tensor

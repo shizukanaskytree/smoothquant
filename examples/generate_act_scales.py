@@ -1,33 +1,28 @@
+# import debugpy; debugpy.listen(5678); debugpy.wait_for_client(); debugpy.breakpoint()
+
 import torch
 import os
+from pathlib import Path
+import argparse
 
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
 )
-import argparse
 
 from smoothquant.calibration import get_act_scales
-
-# import debugpy; debugpy.listen(5678); debugpy.wait_for_client(); debugpy.breakpoint()
 
 def build_model_and_tokenizer(model_name):
     tokenizer = AutoTokenizer.from_pretrained(model_name, model_max_length=512)
     kwargs = {"torch_dtype": torch.float16, "device_map": "sequential"}
     model = AutoModelForCausalLM.from_pretrained(model_name, **kwargs)
-
-    ### 保存成pt文件后进行可视化
-    # print(f"model: \n{model}")
-    # torch.save(model, "./logs/model.pt")
-    # torch.onnx.export(model, model, "./logs/model.onnx")
-
     return model, tokenizer
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model-name', type=str,
                         default='facebook/opt-1.3b', help='model name')
-    parser.add_argument('--output-path', type=str, default='act_scales/opt-1.3b.pt',
+    parser.add_argument('--scale-act-output-path', type=str, default='act_scales/opt-1.3b.pt',
                         help='where to save the act scales')
     parser.add_argument('--dataset-path', type=str, default='dataset/val.jsonl.zst',
                         help='location of the calibration dataset, we use the validation set of the Pile dataset')
@@ -36,19 +31,11 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-
 @torch.no_grad()
 def main():
     args = parse_args()
     print(f"model name: {args.model_name}")
     model, tokenizer = build_model_and_tokenizer(args.model_name)
-
-    #---------------------------------------------------------------------------
-    ### todo: hardcode now
-    if True: # save tokenizer locally and then we can upload to my HF hub: https://huggingface.co/skytree/smoothquant-models/tree/main
-        print("Saving tokenizer locally...")
-        tokenizer.save_pretrained("/workspace/outside-docker/smoothquant-prj/smoothquant/examples/int8_models-origin/opt-125m-smoothquant.pt")
-    #---------------------------------------------------------------------------
 
     ### debugging
     # for name, module in model.named_modules():
@@ -66,12 +53,8 @@ def main():
     act_scales = get_act_scales(model, tokenizer, args.dataset_path,
                                 args.num_samples, args.seq_len)
 
-    ### debugging
-    # print(act_scales), key is layer name, value is tensor
-
-    os.makedirs(os.path.dirname(args.output_path), exist_ok=True)
-    torch.save(act_scales, args.output_path)
-
+    os.makedirs(os.path.dirname(args.scale_act_output_path), exist_ok=True)
+    torch.save(act_scales, args.scale_act_output_path)
 
 if __name__ == '__main__':
     main()

@@ -45,3 +45,5 @@ python export_naive_w8a8.py \
 #-------------------------------------------------------------------------------
 
 ### Next step: eval the model using https://github.com/shizukanaskytree/lm-evaluation-harness/blob/dev-big-refactor-20230919/run-scripts/run-smoothquant.sh
+
+### End
