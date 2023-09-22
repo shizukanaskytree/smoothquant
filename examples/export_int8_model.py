@@ -7,7 +7,6 @@ from pathlib import Path
 
 from transformers.models.opt.modeling_opt import OPTForCausalLM
 from transformers import AutoTokenizer
-from huggingface_hub import HfApi, create_repo
 
 from smoothquant.opt import Int8OPTForCausalLM
 from smoothquant.smooth import smooth_lm
@@ -44,22 +43,16 @@ if __name__ == '__main__':
     parser.add_argument("--model-name", type=str, default='facebook/opt-13b')
     parser.add_argument("--num-samples", type=int, default=512)
     parser.add_argument("--seq-len", type=int, default=512)
-    parser.add_argument("--act-scales", type=str,
-                        default='act_scales/opt-13b.pt')
+    parser.add_argument("--act-scales", type=str, default='act_scales/opt-13b.pt')
     parser.add_argument("--output-path", type=str, default='int8_models for the following ipynb demo example')
-    parser.add_argument("--smoothquant-output", type=str, default=None,
-                        help="where to save the original smoothquant int8 model")
-    parser.add_argument("--hf_repo_id", type=str, default=None,
-                        help="HF hub repo id, skytree/smoothquant-[MODEL_NAME], skytree/smoothquant-opt-125m, skytree/smoothquant-opt-6.7b, skytree/smoothquant-opt-13b")
-    parser.add_argument('--dataset-path', type=str, default='dataset/val.jsonl.zst',
-                        help='location of the calibration dataset, we use the validation set of the Pile dataset')
+    parser.add_argument("--smoothquant-output", type=str, default=None, help="where to save the original smoothquant int8 model")
+    parser.add_argument("--hf_repo_id", type=str, default=None, help="HF hub repo id, skytree/smoothquant-[MODEL_NAME], skytree/smoothquant-opt-125m, skytree/smoothquant-opt-6.7b, skytree/smoothquant-opt-13b")
+    parser.add_argument('--dataset-path', type=str, default='dataset/val.jsonl.zst', help='location of the calibration dataset, we use the validation set of the Pile dataset')
     parser.add_argument('--export-FT', default=False, action="store_true")
     parser.add_argument('--torch-viewer', default=False, action="store_true", help="visualize pytorch int8 models https://github.com/mert-kurttutan/torchview")
     args = parser.parse_args()
 
-    model = OPTForCausalLM.from_pretrained(
-        args.model_name, device_map="auto", torch_dtype=torch.float16)
-
+    model = OPTForCausalLM.from_pretrained(args.model_name, device_map="auto", torch_dtype=torch.float16)
     # print(f"OPTForCausalLM:\n{model}")
 
     ### debugging

@@ -2,7 +2,6 @@
 
 import torch
 import os
-from pathlib import Path
 import argparse
 
 from transformers import (
@@ -20,12 +19,9 @@ def build_model_and_tokenizer(model_name):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model-name', type=str,
-                        default='facebook/opt-1.3b', help='model name')
-    parser.add_argument('--scale-act-output-path', type=str, default='act_scales/opt-1.3b.pt',
-                        help='where to save the act scales')
-    parser.add_argument('--dataset-path', type=str, default='dataset/val.jsonl.zst',
-                        help='location of the calibration dataset, we use the validation set of the Pile dataset')
+    parser.add_argument('--model-name', type=str, default='facebook/opt-1.3b', help='model name')
+    parser.add_argument('--scale-act-output-path', type=str, default='act_scales/opt-1.3b.pt', help='where to save the act scales')
+    parser.add_argument('--dataset-path', type=str, default='dataset/val.jsonl.zst', help='location of the calibration dataset, we use the validation set of the Pile dataset')
     parser.add_argument('--num-samples', type=int, default=512)
     parser.add_argument('--seq-len', type=int, default=512)
     args = parser.parse_args()

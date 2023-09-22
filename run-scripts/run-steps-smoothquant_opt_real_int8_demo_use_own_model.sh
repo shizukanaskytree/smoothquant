@@ -40,18 +40,18 @@
 
 #-----------------------------------------------------------------------
 
-MODEL_SIZE="opt-125m"
-# MODEL_SIZE="opt-6.7b"
+# MODEL_SIZE="opt-125m"
+MODEL_SIZE="opt-6.7b"
 # MODEL_SIZE="opt-13b"
 MODEL_NAME="facebook/$MODEL_SIZE"
 
-ACT_SCALES_PT_FILE="./act_scales/$MODEL_SIZE.pt"
-DATASET_PATH="pile-val-backup/val.jsonl.zst"
-SMOOTHQUANT_OUTPUT="smoothquant-$MODEL_SIZE"
+ACT_SCALES_PT_FILE="../examples/act_scales/$MODEL_SIZE.pt"
+DATASET_PATH="../examples/pile-val-backup/val.jsonl.zst"
+SMOOTHQUANT_OUTPUT="../examples/smoothquant-$MODEL_SIZE"
 
-mkdir -p logs
+# mkdir -p logs
 
-python generate_act_scales.py \
+python ../examples/generate_act_scales.py \
     --model-name $MODEL_NAME \
     --scale-act-output-path $ACT_SCALES_PT_FILE \
     --dataset-path $DATASET_PATH \
@@ -61,7 +61,7 @@ python generate_act_scales.py \
 
 #-----------------------------------------------------------------------
 
-python export_int8_model.py \
+python ../examples/export_int8_model.py \
     --model-name $MODEL_NAME \
     --num-samples 1000 \
     --seq-len 512 \
