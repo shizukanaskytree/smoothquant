@@ -60,4 +60,5 @@ if __name__ == '__main__':
         int8_model = Int8OPTForCausalLM.from_float(model, decoder_layer_scales)
 
         int8_model.save_pretrained(output_path)
-        print(f"Saved int8 model at {output_path}")
+        tokenizer.save_pretrained(output_path)
+        print(f"Saved smoothquant model and tokenizer at {output_path}")
