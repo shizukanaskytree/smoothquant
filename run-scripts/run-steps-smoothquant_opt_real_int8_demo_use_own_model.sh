@@ -51,11 +51,14 @@ SMOOTHQUANT_OUTPUT="../examples/smoothquant-$MODEL_SIZE"
 
 # mkdir -p logs
 
+### if you use validation set, data leak?
+NUM_SAMPLES=512
+
 python ../examples/generate_act_scales.py \
     --model-name $MODEL_NAME \
     --scale-act-output-path $ACT_SCALES_PT_FILE \
     --dataset-path $DATASET_PATH \
-    --num-samples 512 \
+    --num-samples $NUM_SAMPLES \
     --seq-len 512
     # 2>&1 | tee logs/generate_act_scales_$(date +"%Y-%m-%d_%H-%M-%S").log
 
@@ -63,7 +66,7 @@ python ../examples/generate_act_scales.py \
 
 python ../examples/export_int8_model.py \
     --model-name $MODEL_NAME \
-    --num-samples 1000 \
+    --num-samples $NUM_SAMPLES \
     --seq-len 512 \
     --act-scales $ACT_SCALES_PT_FILE \
     --dataset-path $DATASET_PATH \

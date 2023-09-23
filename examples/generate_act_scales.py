@@ -46,8 +46,7 @@ def main():
         print('You can download the validation dataset of the Pile at https://mystic.the-eye.eu/public/AI/pile/val.jsonl.zst')
         raise FileNotFoundError
 
-    act_scales = get_act_scales(model, tokenizer, args.dataset_path,
-                                args.num_samples, args.seq_len)
+    act_scales = get_act_scales(model, tokenizer, args.dataset_path, args.num_samples, args.seq_len)
 
     os.makedirs(os.path.dirname(args.scale_act_output_path), exist_ok=True)
     torch.save(act_scales, args.scale_act_output_path)

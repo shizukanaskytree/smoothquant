@@ -50,6 +50,7 @@ def get_act_scales(model, tokenizer, dataset_path, num_samples=512, seq_len=512)
 
     dataset = load_dataset("json", data_files=dataset_path, split="train")
     dataset = dataset.shuffle(seed=42)
+    print(f"len of dataset: {len(dataset)}")
 
     for i in tqdm(range(num_samples)):
         input_ids = tokenizer(dataset[i]["text"], return_tensors="pt",
