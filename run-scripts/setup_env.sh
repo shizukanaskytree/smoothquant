@@ -15,7 +15,7 @@ watch -n0.1 nvidia-smi
 LOCAL_DIR=/home/xiaofeng.wu/prjs/zip-model/docker_file_system
 CONTAINER_DIR=/workspace/outside-docker
 CONTAINER_NAME=zip_model
-docker run --name $CONTAINER_NAME --gpus all --ipc=host -it -v $LOCAL_DIR:$CONTAINER_DIR $IMAGE
+docker run --privileged --name $CONTAINER_NAME --gpus all --ipc=host -it -v $LOCAL_DIR:$CONTAINER_DIR $IMAGE
 
 #-------------------------------------------------------------------------------
 
