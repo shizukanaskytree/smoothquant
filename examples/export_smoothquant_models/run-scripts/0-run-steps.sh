@@ -8,3 +8,4 @@ opt-6.7b-smoothquant.sh
 
 opt-13b-smoothquant.sh
 
+run_smoothquant_opt_real_my_model.sh

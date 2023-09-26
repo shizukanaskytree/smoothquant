@@ -89,10 +89,10 @@ conda activate smoothquant
 ### Please install [torch-int](https://github.com/Guangxuan-Xiao/torch-int) before running the SmoothQuant PyTorch INT8 inference.
 cd ..
 
-### https://github.com/Guangxuan-Xiao/torch-int
-# git clone --recurse-submodules https://github.com/Guangxuan-Xiao/torch-int.git ### 只在第一次执行
-
+# https://github.com/Guangxuan-Xiao/torch-int.git
+git clone --recurse-submodules https://github.com/shizukanaskytree/torch-int.git # 只在第一次执行
 cd torch-int
+git checkout dev-bias-2023-0924 # 修改了 bias 的 shape
 conda install -c anaconda gxx_linux-64=9 -y
 pip install -r requirements.txt
 source environment.sh
