@@ -18,9 +18,9 @@
 # - [Accelerate](https://github.com/huggingface/accelerate)
 
 # %%
-model_type_size = "opt-125m"
+# model_type_size = "opt-125m"
 # model_type_size = "opt-6.7b"
-# model_type_size = "opt-13b"
+model_type_size = "opt-13b"
 
 fb_model_name = f"facebook/{model_type_size}"
 
