@@ -1,4 +1,4 @@
-MODEL_SIZE="opt-6.7b"
+MODEL_SIZE="opt-125m"
 MODEL_NAME="facebook/$MODEL_SIZE"
 
 ACT_SCALES_PT_FILE="../../../act_scales/$MODEL_SIZE.pt"

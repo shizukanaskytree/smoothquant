@@ -166,3 +166,4 @@ cython_debug/
 
 act_scales/*.pt
 examples/export_smoothquant_models/smoothquant_output/*
+examples/export_smoothquant_models/smoothquant_output_eval/*
