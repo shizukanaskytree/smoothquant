@@ -31,6 +31,46 @@ def quantize_model(model, weight_quant='per_tensor', act_quant='per_tensor', qua
             m.out_proj = W8A8Linear.from_float(m.out_proj, weight_quant=weight_quant, act_quant=act_quant)
     return model
 
+class Evaluator:
+    """
+    In this demo, we have simplified the evaluation by using the first 1,000
+    samples from the LAMBADA dataset's validation set. We employ the "Last Token
+    Prediction Accuracy" as our evaluation metric. This approximate evaluation
+    is intended for demonstration purposes, providing simple but meaningful
+    comparisons of relative performance between methods. For a more strict
+    assessment, we recommend using the
+    [lm-eval-harness](https://github.com/EleutherAI/lm-evaluation-harness) to
+    obtain the "Last Word Prediction Accuracy" for the LAMBADA dataset, which is
+    the reported metric in our paper.
+    """
+    def __init__(self, dataset, tokenizer, device):
+        self.dataset = dataset
+        self.tokenizer = tokenizer
+        self.device = device
+
+        # tokenize the dataset
+        def tokenize_function(examples):
+            example = self.tokenizer(examples['text'])
+            return example
+
+        self.dataset = self.dataset.map(tokenize_function, batched=True)
+        self.dataset.set_format(type='torch', columns=['input_ids'])
+
+    @torch.no_grad()
+    def evaluate(self, model):
+        model.eval()
+        # The task is to predict the last word of the input.
+        total, hit = 0, 0
+        for batch in self.dataset:
+            input_ids = batch['input_ids'].to(self.device).unsqueeze(0)
+            label = input_ids[:, -1]
+            outputs = model(input_ids)
+            last_token_logits = outputs.logits[:, -2, :]
+            pred = last_token_logits.argmax(dim=-1)
+            total += label.size(0)
+            hit += (pred == label).sum().item()
+        acc = hit / total
+        return acc
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Load a specific model.")
@@ -38,10 +78,6 @@ def parse_arguments():
         help='Name of the OPT model to load. facebook/opt-125m, facebook/opt-6.7b, facebook/opt-13b')
     parser.add_argument('--naive_w8a8_output', type=str, default='',
         help='Saved w8a8 model to local path')
-    parser.add_argument('--fp16_model_output', type=str, default='',
-        help='Saved f16 model to local path')
-    parser.add_argument('--hf-repo-id', type=str, default=None,
-        help='HF Hub ID, e.g., skytree/smoothquant-models, if None, then we do not upload to HF hub')
     args = parser.parse_args()
     return args
 
@@ -49,8 +85,7 @@ def main():
     args = parse_arguments()
 
     model_name = args.model_name
-    model_fp16 = OPTForCausalLM.from_pretrained(
-        model_name, torch_dtype=torch.float16, device_map='auto')
+    model_fp16 = OPTForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16, device_map='auto')
 
     ### convert the model to W8A8
     model_w8a8 = quantize_model(model_fp16)
@@ -62,16 +97,12 @@ def main():
     tokenizer.save_pretrained(w8a8_saved_path)
     model_w8a8.save_pretrained(w8a8_saved_path)
 
-    fp16_saved_path = Path(args.fp16_model_output) / args.model_name
-    tokenizer.save_pretrained(fp16_saved_path)
-    model_fp16.save_pretrained(fp16_saved_path)
-
-    # dataset = load_dataset('lambada', split='validation[:1000]') # for testing
+    dataset = load_dataset('lambada', split='validation[:1000]') # for testing
     # dataset = load_dataset('lambada', split='validation')
-    # evaluator = Evaluator(dataset, tokenizer, 'cuda')
+    evaluator = Evaluator(dataset, tokenizer, 'cuda')
 
-    # acc_w8a8 = evaluator.evaluate(model_w8a8)
-    # print(f'Naive W8A8 quantized model accuracy: {acc_w8a8}')
+    acc_w8a8 = evaluator.evaluate(model_w8a8)
+    print(f'Naive W8A8 quantized model accuracy: {acc_w8a8}')
 
 if __name__ == '__main__':
     main()

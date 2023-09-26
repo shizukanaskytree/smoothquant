@@ -181,3 +181,7 @@ reproduce_experiments/run-export-naive-w8a8-benchmark.sh
 act_scales/*.pt
 examples/export_smoothquant_models/smoothquant_output/*
 examples/export_smoothquant_models/smoothquant_output_eval/*
+
+examples/export_naive_w8a8/naive_w8a8_opt-125m
+examples/export_naive_w8a8/naive_w8a8_opt-6.7b
+examples/export_naive_w8a8/naive_w8a8_opt-13b
