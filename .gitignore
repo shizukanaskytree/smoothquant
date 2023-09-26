@@ -178,3 +178,6 @@ examples/pile-val-backup/pile-val-backup
 reproduce_experiments/run-export-smoothquant-int8-model.sh
 reproduce_experiments/pile-val-backup
 reproduce_experiments/run-export-naive-w8a8-benchmark.sh
+act_scales/*.pt
+examples/export_smoothquant_models/smoothquant_output/*
+examples/export_smoothquant_models/smoothquant_output_eval/*

@@ -122,4 +122,5 @@ if __name__ == '__main__':
         #             print(f"Module: {name} | Bias Shape: {module.bias.shape}")
 
         int8_model.save_pretrained(output_path)
-        print(f"Saved int8 model at {output_path}")
+        tokenizer.save_pretrained(output_path)
+        print(f"Saved smoothquant model and tokenizer at {output_path}")
